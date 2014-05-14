@@ -11,6 +11,35 @@ var pfAdvanceScrobbler = {
     lastTrack: ''
 };
 
+pfAdvanceScrobbler.parseDuration = function (match) {
+    var duration = 120;
+    try {
+        match = match.split(' / ')[1];
+        var mins = match.substring(0, match.indexOf(':'));
+        var seconds = match.substring(match.indexOf(':') + 1);
+        duration = parseInt(mins, 10) * 60 + parseInt(seconds, 10);
+    } catch (e) {}
+    return duration;
+}
+
+pfAdvanceScrobbler.parseArtist = function (titleString) {
+    try {
+        artist = titleString.split(':')[0];
+        return artist;
+    } catch (err) {
+        return '';
+    }
+}
+pfAdvanceScrobbler.cancel = function () {
+    $(window).unload(function () {
+        // reset the background scrobbler song data
+        chrome.extension.sendRequest({
+            type: 'reset'
+        });
+        return true;
+    });
+}
+
 $(document).ready(function () {
     var pf = window.pfAdvanceScrobbler;
     pf.cancel();
@@ -63,32 +92,3 @@ $(document).ready(function () {
         }
     });
 });
-
-pfAdvanceScrobbler.parseDuration = function (match) {
-    var duration = 120;
-    try {
-        match = match.split(' / ')[1];
-        var mins = match.substring(0, match.indexOf(':'));
-        var seconds = match.substring(match.indexOf(':') + 1);
-        duration = parseInt(mins, 10) * 60 + parseInt(seconds, 10);
-    } catch (e) {}
-    return duration;
-}
-
-pfAdvanceScrobbler.parseArtist = function (titleString) {
-    try {
-        artist = titleString.split(':')[0];
-        return artist;
-    } catch (err) {
-        return '';
-    }
-}
-pfAdvanceScrobbler.cancel = function () {
-    $(window).unload(function () {
-        // reset the background scrobbler song data
-        chrome.extension.sendRequest({
-            type: 'reset'
-        });
-        return true;
-    });
-}
